@@ -96,10 +96,10 @@ sub render {
 	my $pdflatex_command = $self->{pdflatex_command};
 	warn "render:  $pdflatex_command $file_name.tex<br/>\n";
 	system "$pdflatex_command $file_name.tex";  # produces a .pdf file
-	unless (-r "$file_name.pdf" ) {
-		warn "file $file_name.pdf was not created<br/>\n";
+	unless (-r "$working_dir/$file_name.pdf" ) {
+		warn "file $working_dir/$file_name.pdf was not created<br/>\n";
 	} else {
-		warn "file $file_name.pdf created<br/>\n";
+		warn "file $working_dir/$file_name.pdf created<br/>\n";
 		unless ($self->convert) {
 			warn "convert operation failed<br/>\n";
 		} else {
