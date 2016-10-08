@@ -1,6 +1,6 @@
 ##DESCRIPTION
 
-
+# TEST from the tikz from a pg problem
 
 ##ENDDESCRIPTION
 
@@ -27,7 +27,7 @@ $showPartialCorrectAnswers = 1;
 
 $working_dir = "$envir{templateDirectory}tikztest";
 $file_name    = "potato2";
-$destination_path = "$envir{templateDirectory}tikztest/$file_name.png";
+$destination_path = "$envir{templateDirectory}tikztest/$file_name";
 
 sub tikz_graph{
 	my $drawing = TikZ_Image2->new();
@@ -35,19 +35,22 @@ sub tikz_graph{
 		$drawing->{working_dir}=$working_dir;
 		$drawing->{file_name}=$file_name;
 		$drawing->{destination_path}= $destination_path;
-		$drawing->set_commandline_mode("macbook"); # "wwtest" or "macbook"
+		$drawing->set_commandline_mode("macbook"); # "wwtest" or "macbook" or "hosted2"
 	# end initialize
 	$drawing->addTex(shift);
 	$drawing->render();
 	return $drawing->{destination_path};
 }
  
-$path = tikz_graph("\begin{tikzpicture}[main_node/.style={circle,fill=blue!20,draw,minimum size=1em,inner sep=3pt]}] 
+$path = tikz_graph("
+\begin{tikzpicture}[main_node/.style={circle,fill=blue!20,draw,minimum size=1em,inner sep=3pt]}] 
 \node[main_node] (1) at (0,0) {1}; 
- \node[main_node] (2) at (-1, -1.5)  {2};
-  \node[main_node] (3) at (1, -1.5) {3}; 
-  \draw (1) -- (2) -- (3) -- (1); 
-   \end{tikzpicture}");
+\node[main_node] (2) at (-1, -1.5)  {2};
+\node[main_node] (3) at (1, -1.5) {3}; 
+\draw (1) -- (2) -- (3) -- (1); 
+\end{tikzpicture}
+"
+);
 
 #listVariables();
 Context("Numeric");
@@ -60,11 +63,14 @@ Context("Numeric");
 
 Context()->texStrings;
 BEGIN_TEXT
-Print hi 
-$BR working_dir = $working_dir;
-$BR file_name = $file_name
-$BR destination_path = $destination_path;
-$BR path = $path;
+	Print hi 
+	$BR working_dir = $working_dir;
+	$BR file_name = $file_name
+	$BR destination_path = $destination_path.pdf;
+	$BR path = $path.png;
+	$BR alias = \{alias("$path.png")\}
+	$PAR image = \{image("$path.png")\}
+	$PAR
 END_TEXT
 Context()->normalStrings;
 

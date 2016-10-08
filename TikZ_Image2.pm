@@ -34,19 +34,22 @@ sub new {
 
 #typical values for command line apps
 
+my $extern_pdflatex='';
 sub set_commandline_mode {
 	my $self = shift;
 	my $commandline_mode = shift;    #FIXME this section is temporary
 	my $working_dir = $self->{working_dir};
 	if ($commandline_mode eq 'wwtest') {		
-		$self->{pdflatex_command} = "cd $working_dir; /Volumes/WW_test/opt/local/texlive/2010/bin/x86_64-darwin/pdflatex --shell-escape";
-		$self->{convert_command}  = "convert";
-		$self->{copy_command}     = "cp";
+		$extern_pdflatex="/Volumes/WW_test/opt/local/bin/pdflatex --shell-escape";
+		$self->{convert_command}  = "convert $working_dir hardcopy.pdf ";
+		$self->{copy_command}     = "cp ";
 	} elsif ( $commandline_mode eq 'macbook') {
-		$self->{pdflatex_command} ="cd $working_dir; /Library/TeX/texbin/pdflatex --shell-escape";
-		$self->{convert_command}  = "/usr/local/bin/convert";
-		$self->{copy_command}     = "cp";
+		$extern_pdflatex ="/Library/TeX/texbin/pdflatex --shell-escape";
+		$self->{convert_command}  = "/usr/local/bin/convert $working_dir/hardcopy.pdf ";
+		$self->{copy_command}     = "cp ";
 	}
+	$self->{pdflatex_command}=  "cd " . $working_dir . " && "
+		. $extern_pdflatex. " >pdflatex.stdout 2>pdflatex.stderr hardcopy";
 }
 # Insert your TikZ image code, not including begin and end tags, as a single
 # string parameter for this method. Works best single quoted.
@@ -84,7 +87,7 @@ sub render {
 	my $self = shift;
 	my $working_dir =  $self->{working_dir};
 	my $file_name = $self->{file_name};
-	my $file_path = "$working_dir/$file_name";
+	my $file_path = "$working_dir/hardcopy";
 	my $html_directory   = $self->{html_temp};
 	my $fh;
 	open( $fh, ">", "$file_path.tex" ) or warn "Can't open $file_path.tex for writing<br/>\n";
@@ -94,12 +97,12 @@ sub render {
 	print $fh $self->footer();
 	close $fh;	
 	my $pdflatex_command = $self->{pdflatex_command};
-	warn "render:  $pdflatex_command $file_name.tex<br/>\n";
-	system "$pdflatex_command $file_name.tex";  # produces a .pdf file
-	unless (-r "$working_dir/$file_name.pdf" ) {
-		warn "file $working_dir/$file_name.pdf was not created<br/>\n";
+	warn "render:  $pdflatex_command <br/>\n";
+	system "$pdflatex_command ";  # produces a .pdf file
+	unless (-r "$working_dir/hardcopy.pdf" ) {
+		warn "file $working_dir/hardcopy.pdf was not created<br/>\n";
 	} else {
-		warn "file $working_dir/$file_name.pdf created<br/>\n";
+		warn "file $working_dir/hardcopy.pdf created<br/>\n";
 		unless ($self->convert) {
 			warn "convert operation failed<br/>\n";
 		} else {
@@ -124,8 +127,8 @@ sub convert {
 	my $file_name = $self->{file_name};
 	my $file_path = "$working_dir/$file_name";
 	my $convert_command = $self->{convert_command};
-	warn "converting: ","$convert_command $file_path.pdf $file_path.png","\n"; 
-	system "$convert_command $file_path.pdf $file_path.png";
+	warn "converting: ","$convert_command  $file_path.png","\n"; 
+	system "$convert_command  $file_path.png";
 	return -r "$file_path.png";
 }
 
@@ -146,7 +149,7 @@ sub copy {
 	my $file_path = "$working_dir/$file_name";
 	my $destination_path = $self->{destination_path};
 	my $copy_command = $self->{copy_command};
-	warn "copy: $copy_command $working_dir/$file_name.png $destination_path\n";	
+	warn "copy: $copy_command $working_dir/$file_name.png $destination_path.png\n";	
 	system "$copy_command $working_dir/$file_name.png $destination_path.png";
 	return -r "$destination_path.png";
 }
