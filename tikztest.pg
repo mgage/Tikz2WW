@@ -1,0 +1,80 @@
+##DESCRIPTION
+
+
+
+##ENDDESCRIPTION
+
+
+DOCUMENT();        # This should be the first executable line in the problem.
+
+loadMacros(
+   "PGstandard.pl",     # Standard macros for PG language
+   "MathObjects.pl",
+   "PGinfo.pl",
+   #"source.pl",         # used to display problem source button
+   "PGcourse.pl",      # Customization file for the course
+);
+
+TEXT(beginproblem());
+$showPartialCorrectAnswers = 1;
+
+##############################################################
+#
+#  Setup
+#
+#
+
+
+$working_dir = "$envir{templateDirectory}tikztest";
+$file_name    = "potato2";
+$destination_path = "$envir{templateDirectory}tikztest/$file_name.png";
+
+sub tikz_graph{
+	my $drawing = TikZ_Image2->new();
+	# initialize
+		$drawing->{working_dir}=$working_dir;
+		$drawing->{file_name}=$file_name;
+		$drawing->{destination_path}= $destination_path;
+		$drawing->set_commandline_mode("macbook"); # "wwtest" or "macbook"
+	# end initialize
+	$drawing->addTex(shift);
+	$drawing->render();
+	return $drawing->{destination_path};
+}
+ 
+$path = tikz_graph("\begin{tikzpicture}[main_node/.style={circle,fill=blue!20,draw,minimum size=1em,inner sep=3pt]}] 
+\node[main_node] (1) at (0,0) {1}; 
+ \node[main_node] (2) at (-1, -1.5)  {2};
+  \node[main_node] (3) at (1, -1.5) {3}; 
+  \draw (1) -- (2) -- (3) -- (1); 
+   \end{tikzpicture}");
+
+#listVariables();
+Context("Numeric");
+
+##############################################################
+#
+#  Text
+#
+#
+
+Context()->texStrings;
+BEGIN_TEXT
+Print hi 
+$BR working_dir = $working_dir;
+$BR file_name = $file_name
+$BR destination_path = $destination_path;
+$BR path = $path;
+END_TEXT
+Context()->normalStrings;
+
+
+##############################################################
+#
+#  Answers
+#
+#
+
+
+
+ENDDOCUMENT();        # This should be the last executable line in the problem.
